@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Popup.scss';
-import { number } from 'prop-types';
+import { message } from './message';
+
 const cacheKey = {
   RUN: 'isRunning',
   ALARM_CONFIG: 'alarmConfig',
@@ -8,9 +9,9 @@ const cacheKey = {
 };
 const Popup: React.FC = () => {
   const [way, setWay] = useState('hourly'); // default hourly alarm
-  const [interval, setInterval] = useState(40); // default 40 minites
-  const [isRunning, setIsRunning] = useState(false)
-  const [nextFireAt, setNextFireAt] = useState(new Date)
+  const [interval, setInterval] = useState(60); // default 40 minites
+  const [isRunning, setIsRunning] = useState(false);
+  const [nextFireAt, setNextFireAt] = useState(new Date());
   useEffect(() => {
     chrome.storage.sync.get([cacheKey.RUN], result => {
       if (result[cacheKey.RUN]) {
@@ -21,10 +22,9 @@ const Popup: React.FC = () => {
       }
     });
 
-    if(isRunning) {
-
+    if (isRunning) {
     }
-  })
+  });
   const handleWayChange = event => {
     setWay(event.target.value);
   };
@@ -33,9 +33,9 @@ const Popup: React.FC = () => {
   };
 
   const _startAlarm = alarmInfo => {
-    chrome.alarms.onAlarm.addListener(alarm=>{
-      
-    })
+    chrome.alarms.onAlarm.addListener(alarm => {
+      message('Time to rest, or you will die for this.');
+    });
     chrome.alarms.create(cacheKey.ALARM, alarmInfo);
     setIsRunning(true);
     chrome.storage.sync.set({ [cacheKey.ALARM_CONFIG]: alarmInfo });
@@ -53,16 +53,7 @@ const Popup: React.FC = () => {
 
     if (!isHourly()) {
       if (interval < 4) {
-        chrome.notifications.create(
-          'error',
-          {
-            iconUrl: 'icon128.png',
-            type: 'basic',
-            title: 'Error',
-            message: 'Interval must be larger than 4 mintes!'
-          },
-          function(notificationId) {}
-        );
+        message('Interval must be larger than 4 mintes!', 'Error');
         return;
       }
       alarmInfo = {
@@ -75,9 +66,9 @@ const Popup: React.FC = () => {
   const handleStop = () => {
     chrome.storage.sync.clear();
     chrome.alarms.clearAll();
-    setIsRunning(false)
-    setWay('hourly')
-    setInterval(40)
+    setIsRunning(false);
+    setWay('hourly');
+    setInterval(60);
   };
   return (
     <div className="Popup">
