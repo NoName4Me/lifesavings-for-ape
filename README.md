@@ -1,11 +1,17 @@
-# Chrome Extension (built with TypeScript + React)
+# Lifesavings for Ape
 
+> 🙈 the key thing for life is rest.
 
-## Building
+## Usages
 
-1.  Clone repo
-2.  `npm i`
-3.  `npm run dev` to compile once or `npm run watch` to run the dev task in watch mode
-4.  `npm run build` to build a production (minified) version
+```bash
+npm i
 
+npm run dev
 
+## dev in watch mode
+npm run watch
+
+## build
+npm run build
+```

@@ -12,40 +12,54 @@ const Popup: React.FC = () => {
   const [interval, setInterval] = useState(60); // default 40 minites
   const [isRunning, setIsRunning] = useState(false);
   const [nextFireAt, setNextFireAt] = useState(new Date());
+
   useEffect(() => {
+    if(isRunning) return
+
     chrome.storage.sync.get([cacheKey.RUN], result => {
       if (result[cacheKey.RUN]) {
         setIsRunning(true);
         chrome.alarms.get(cacheKey.ALARM, alarm => {
-          setNextFireAt(new Date(alarm.scheduledTime));
+          if (!alarm || !alarm.scheduledTime) {
+            handleStop()
+          }else {
+            setNextFireAt(new Date(alarm.scheduledTime));
+          }
         });
       }
     });
-
-    if (isRunning) {
-    }
   });
+
   const handleWayChange = event => {
     setWay(event.target.value);
   };
+
   const isHourly = () => {
     return way === 'hourly';
   };
 
   const _startAlarm = alarmInfo => {
+    alert(JSON.stringify(alarmInfo))
+    handleStop()
     chrome.alarms.onAlarm.addListener(alarm => {
-      message('Time to rest, or you will die for this.');
+      chrome.runtime.sendMessage({
+        msg: 'Time to rest, or you will die for this.',
+        title: 'zzZZ~',
+        alwaysShow: true
+      });
     });
     chrome.alarms.create(cacheKey.ALARM, alarmInfo);
     setIsRunning(true);
     chrome.storage.sync.set({ [cacheKey.ALARM_CONFIG]: alarmInfo });
     chrome.storage.sync.set({ [cacheKey.RUN]: true });
   };
+
   const handleStart = () => {
     let now = new Date();
-    now.setMinutes(0);
-    now.setMilliseconds(0);
     now.setSeconds(0);
+    now.setMilliseconds(0);
+    now.setMinutes(0);
+    now.setHours(now.getHours() + 1);
     let alarmInfo: { when?: number; periodInMinutes?: number } = {
       when: now.getTime(),
       periodInMinutes: 60
@@ -74,7 +88,7 @@ const Popup: React.FC = () => {
     <div className="Popup">
       {isRunning ? (
         <div>
-          Latest Fire Will @{' '}
+          Latest Fire Will be @{' '}
           <span className="time-str">{nextFireAt.toString()}</span>
         </div>
       ) : (

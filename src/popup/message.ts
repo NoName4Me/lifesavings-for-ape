@@ -1,12 +1,9 @@
-export function message(msg: string, title = '') {
-  chrome.notifications.create(
-    'error',
-    {
-      iconUrl: 'icon128.png',
-      type: 'basic',
-      title: title,
-      message: msg
-    },
-    function (notificationId) { }
-  );
+export function message(msg: string, title = '', alwaysShow = false) {
+  chrome.notifications.create('error', {
+    iconUrl: 'icon48.png',
+    type: 'basic',
+    title: title,
+    message: msg,
+    requireInteraction: alwaysShow,
+  });
 }

@@ -1,11 +1,7 @@
-// Listen to messages sent from other parts of the extension.
+import { message } from './popup/message';
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    // onMessage must return "true" if response is async.
-    let isResponseAsync = false;
-
-    if (request.popupMounted) {
-        console.log('eventPage notified that Popup.tsx has mounted.');
-    }
-
-    return isResponseAsync;
+  if (request.msg) {
+    message(request.msg, request.title, request.alwaysShow);
+  }
 });
